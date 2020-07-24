@@ -1,5 +1,5 @@
 from woocommerce import API
-from .config import Config
+from config import Config
 
 
 class Store:
