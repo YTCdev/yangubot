@@ -1,3 +1,6 @@
+from discord import Colour
+
+
 class Config:
     WCM_URL = ''
     WCM_KEY = ''
@@ -11,3 +14,13 @@ class Config:
                  'FI', 'FR', 'DE', 'GR', 'HU', 'HR', 'IE', 'IT', 'LV', 'LT',
                  'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE',
                  'GB']
+
+    COLOURS = {
+        'completed': Colour(0x4caf50),
+        'cancelled': Colour(0xf44336),
+        'failed': Colour(0xf44336),
+        'pending': Colour(0xffeb3b),
+        'processing': Colour(0xffeb3b),
+        'on-hold': Colour(0xff9800),
+        'other': Colour(0xffeb3b)
+    }
