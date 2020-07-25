@@ -24,6 +24,17 @@ async def send_error(ctx, message, footer=None):
     if footer is not None:
         embed.set_footer(text=footer)
     await ctx.send(embed=embed)
+    print(message)
+    print('-----')
+
+
+@bot.event
+async def is_staff(user):
+    roles = [role.id for role in user.roles]
+    for staff_role in Config.ROLE_IDS:
+        if staff_role in roles:
+            return True
+    return False
 
 
 @bot.command()
@@ -48,6 +59,15 @@ async def status(ctx, order_id):
     end_time = monotonic()
     print('ok, took {:.2f} s'.format(end_time - start_time))
     print('-----')
+
+
+@bot.command()
+async def wcm(ctx, order_id):
+    if await is_staff(ctx.author):
+        await ctx.author.send(
+            "{}/wp-admin/post.php?post={}&action=edit".format(
+                Config.WCM_URL, order_id))
+        await ctx.message.delete()
 
 
 if __name__ == "__main__":
