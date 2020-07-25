@@ -58,26 +58,30 @@ class Order:
 
     def create_embed(self):
         embed = Embed(title='Order Status', timestamp=self.order_date)
-        if self.status in Config.COUNTRIES:
+        if self.status in Config.COLOURS:
             embed.colour = Config.COLOURS[self.status]
         else:
             embed.colour = Config.COLOURS['other']
 
         embed.add_field(
             name="#{} • :flag_{}:".format(self.id, self.country.lower()),
-            value="**{}**\n{} shipping".format(self.status.capitalize(),
-                                               self.shipping_method.capitalize),
+            value="**{}**\n{} shipping".format(
+                self.status.capitalize(), self.shipping_method.capitalize()),
             inline=True
         )
 
         temp = ''
         if self.arrival_estimate is not None:
             temp += '*Estimated* arrival: {}\n'.format(
-                self.arrival_estimate.strftime("%m/%d/%Y"))
+                self.arrival_estimate.strftime(
+                    "%d %b %Y").lstrip("0").replace(" 0", " "))
         if self.has_tracking:
             temp += 'Check email for tracking info\n'
         if self.status == 'on-hold':
             temp += 'Please check your email'
+
+        if temp == '':
+            temp = 'No updates yet'
 
         embed.add_field(
             name="Notes",
@@ -87,7 +91,8 @@ class Order:
 
         embed.add_field(
             name='Last updated',
-            value=self.modified_date.strftime("%m/%d/%Y, %H:%M:%S"),
+            value=self.modified_date.strftime(
+                "%d %b %Y, %H:%M:%S").lstrip("0").replace(" 0", " "),
             inline=False
         )
 
