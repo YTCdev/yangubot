@@ -12,7 +12,7 @@ class Order:
         self.status = json['status']
         self.product = json['line_items'][0]['name']
         self.sku = json['line_items'][0]['sku']
-        self.country = json['shipping']['country']
+        self.country = json['shipping']['country'] or json['billing']['country']
         self.order_date = self.parse_date(json['date_created'])
         self.modified_date = self.parse_date(json['date_modified'])
         self.shipping_method = json['shipping_lines'][0]['method_title']
