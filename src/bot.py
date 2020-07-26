@@ -70,5 +70,32 @@ async def wcm(ctx, order_id):
         await ctx.message.delete()
 
 
+@bot.event
+async def on_message(message: discord.Message):
+    # prevent bot from reacting to its own messages
+    if message.author.id == bot.user.id:
+        return
+    # gallery chat control
+    if message.channel.id == Config.CHANNELS['gallery']:
+        # if message has pics don't do anything
+        if len(message.attachments) > 0:
+            return
+        # else check if user has previously uploaded any pics
+        allowed = False
+        async for old_message in message.channel.history(limit=75):
+            if old_message.author == message.author and len(old_message.attachments) > 0:
+                allowed = True
+                break
+        # if no pics from that user found, delete and notify
+        if not allowed:
+            await message.delete()
+            await message.channel.send(content=get_gallery_warning(message.author), delete_after=12.5)
+
+
+def get_gallery_warning(user: discord.Member) -> str:
+    return f'{user.mention} - this channel is for **pics only**. Please use <#{Config.CHANNELS["lounge"]}> for discussion or ask in <#{Config.CHANNELS["support"]}> if you have any questions.\n\n' \
+            'If you want to voice your opinion - feel free to do so, just don\'t forget to send some pictures first!'
+
+
 if __name__ == "__main__":
     bot.run(Config.BOT_TOKEN)
