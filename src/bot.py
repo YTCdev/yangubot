@@ -83,18 +83,24 @@ async def on_message(message: discord.Message):
         # else check if user has previously uploaded any pics
         allowed = False
         async for old_message in message.channel.history(limit=75):
-            if old_message.author == message.author and len(old_message.attachments) > 0:
+            if old_message.author == message.author and len(
+                    old_message.attachments) > 0:
                 allowed = True
                 break
         # if no pics from that user found, delete and notify
         if not allowed:
             await message.delete()
-            await message.channel.send(content=get_gallery_warning(message.author), delete_after=12.5)
+            await message.channel.send(
+                content=get_gallery_warning(message.author), delete_after=12.5)
+    await bot.process_commands(message)
 
 
 def get_gallery_warning(user: discord.Member) -> str:
-    return f'{user.mention} - this channel is for **pics only**. Please use <#{Config.CHANNELS["lounge"]}> for discussion or ask in <#{Config.CHANNELS["support"]}> if you have any questions.\n\n' \
-            'If you want to voice your opinion - feel free to do so, just don\'t forget to send some pictures first!'
+    return '{} - this channel is for **pics only**. Please use <#{}> for ' \
+           'discussion or ask in <#{}> if you have any questions.\n\nIf you ' \
+           'want to voice your opinion - feel free to do so, just don\'t ' \
+           'forget to send some pictures first!'.format(
+            user.mention, Config.CHANNELS['lounge'], Config.CHANNELS['support'])
 
 
 if __name__ == "__main__":
