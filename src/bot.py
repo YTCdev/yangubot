@@ -31,7 +31,7 @@ async def send_error(ctx, message, footer=None):
 @bot.event
 async def is_staff(user):
     roles = [role.id for role in user.roles]
-    for staff_role in Config.ROLE_IDS:
+    for staff_role in Config.STAFF_IDS:
         if staff_role in roles:
             return True
     return False
