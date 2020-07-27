@@ -29,8 +29,8 @@ async def send_error(ctx, message, footer=None):
 
 
 @bot.event
-async def is_staff(user):
-    roles = [role.id for role in user.roles]
+async def is_staff(ctx):
+    roles = [role.id for role in ctx.author.roles]
     for staff_role in Config.STAFF_IDS:
         if staff_role in roles:
             return True
@@ -83,12 +83,12 @@ async def add_patron_role(ctx, order: Order):
 
 
 @bot.command()
+@commands.check(is_staff)
 async def wcm(ctx, order_id):
-    if await is_staff(ctx.author):
-        await ctx.author.send(
-            "{}/wp-admin/post.php?post={}&action=edit".format(
-                Config.WCM_URL, order_id))
-        await ctx.message.delete()
+    await ctx.author.send(
+        "{}/wp-admin/post.php?post={}&action=edit".format(
+            Config.WCM_URL, order_id))
+    await ctx.message.delete()
 
 
 @bot.event
