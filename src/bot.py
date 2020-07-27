@@ -20,7 +20,7 @@ async def on_ready():
 
 @bot.event
 async def send_error(ctx, message, footer=None):
-    embed = discord.Embed(title=message, colour=0xF44336)
+    embed = discord.Embed(title=message, colour=Config.COLOURS['failed'])
     if footer is not None:
         embed.set_footer(text=footer)
     await ctx.send(embed=embed)
