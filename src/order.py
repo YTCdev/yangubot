@@ -18,6 +18,7 @@ class Order:
         self.shipping_method = json['shipping_lines'][0]['method_title']
         self.arrival_estimate = self.estimate_shipping()
         self.has_tracking = self.is_tracked()
+        self.discord_id = self.get_discord_id()
 
     def parse_date(self, date_str):
         return dateutil.parser.parse(date_str)
@@ -55,6 +56,11 @@ class Order:
             if 'track' in order_note['note'].lower():
                 return True
         return False
+
+    def get_discord_id(self):
+        return next(
+            (x['value'] for x in self.json['meta_data'] if x['key'] == 'myfield5'), None
+        )
 
     def create_embed(self):
         embed = Embed(title='Order Status', timestamp=self.order_date)

@@ -31,7 +31,7 @@ async def send_error(ctx, message, footer=None):
 @bot.event
 async def is_staff(user):
     roles = [role.id for role in user.roles]
-    for staff_role in Config.ROLE_IDS:
+    for staff_role in Config.STAFF_IDS:
         if staff_role in roles:
             return True
     return False
@@ -57,9 +57,29 @@ async def status(ctx, order_id):
     order = Order(response, notes)
     embed = order.create_embed()
     await ctx.send(embed=embed)
+    if order.status in ['processing', 'completed']:
+        await add_patron_role(ctx, order)
     end_time = monotonic()
     print('ok, took {:.2f} s'.format(end_time - start_time))
     print('-----')
+
+
+async def add_patron_role(ctx, order: Order):
+    # if customer didnt provide his discord ID
+    if not order.discord_id:
+        return
+    user = ctx.guild.get_member_named(order.discord_id)
+    if not user:
+        print('User not in server')
+    elif any(role.id == Config.PATRON_ID for role in user.roles):
+        print('User already has role')
+    else:
+        try:
+            role = discord.utils.get(ctx.guild.roles, id=Config.PATRON_ID)
+            await ctx.author.add_roles(role)
+            print('Added role to user {}'.format(order.discord_id))
+        except discord.Forbidden:
+            print('Missing permissions to add role')
 
 
 @bot.command()
