@@ -11,9 +11,9 @@ class Config:
     ROLE_IDS = []
 
     CHANNELS = {
-        'support': 210588354096529416,
-        'lounge': 210828828300279808,
-        'gallery': 212328069082513408
+        'support': 0,
+        'lounge': 0,
+        'gallery': 0
     }
 
     COUNTRIES = ['CA', 'US', 'AU', 'AT', 'BE', 'BG', 'CY', 'CZ', 'DK', 'EE',

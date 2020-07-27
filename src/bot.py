@@ -1,6 +1,6 @@
+from time import monotonic
 import discord
 from discord.ext import commands
-from time import monotonic
 from config import Config
 from store import Store
 from order import Order
@@ -20,7 +20,7 @@ async def on_ready():
 
 @bot.event
 async def send_error(ctx, message, footer=None):
-    embed = discord.Embed(title=message, colour=0xF44336)
+    embed = discord.Embed(title=message, colour=Config.COLOURS['failed'])
     if footer is not None:
         embed.set_footer(text=footer)
     await ctx.send(embed=embed)
@@ -44,6 +44,7 @@ async def status(ctx, order_id):
     if not order_id.isdigit():
         await send_error(ctx, ':warning: Invalid order ID entered')
         return
+    await ctx.trigger_typing()
     response = ytc.get_order(order_id)
     if 'code' in response:
         if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
@@ -75,24 +76,31 @@ async def on_message(message: discord.Message):
     # prevent bot from reacting to its own messages
     if message.author.id == bot.user.id:
         return
-    # gallery chat control
+    # prevent bot from responding to already-removed messages
     if message.channel.id == Config.CHANNELS['gallery']:
-        # if message has pics don't do anything
-        if len(message.attachments) > 0:
-            return
-        # else check if user has previously uploaded any pics
-        allowed = False
-        async for old_message in message.channel.history(limit=75):
-            if old_message.author == message.author and len(
-                    old_message.attachments) > 0:
-                allowed = True
-                break
-        # if no pics from that user found, delete and notify
-        if not allowed:
-            await message.delete()
-            await message.channel.send(
-                content=get_gallery_warning(message.author), delete_after=12.5)
-    await bot.process_commands(message)
+        if await check_gallery_message(message):
+            await bot.process_commands(message)
+    else:
+        await bot.process_commands(message)
+
+
+async def check_gallery_message(message: discord.Message) -> bool:
+    # ignore message if it has attachments
+    if len(message.attachments) > 0:
+        return True
+
+    # check if user has previously uploaded any pics
+    allowed = False
+    async for old_message in message.channel.history(limit=75):
+        if old_message.author == message.author and len(old_message.attachments) > 0:
+            allowed = True
+            break
+    # if no pics from that user found, delete and notify
+    if not allowed:
+        await message.delete()
+        await message.channel.send(content=get_gallery_warning(message.author),
+                                   delete_after=12.5)
+    return allowed
 
 
 def get_gallery_warning(user: discord.Member) -> str:
@@ -100,7 +108,7 @@ def get_gallery_warning(user: discord.Member) -> str:
            'discussion or ask in <#{}> if you have any questions.\n\nIf you ' \
            'want to voice your opinion - feel free to do so, just don\'t ' \
            'forget to send some pictures first!'.format(
-            user.mention, Config.CHANNELS['lounge'], Config.CHANNELS['support'])
+               user.mention, Config.CHANNELS['lounge'], Config.CHANNELS['support'])
 
 
 if __name__ == "__main__":
