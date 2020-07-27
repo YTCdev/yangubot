@@ -75,24 +75,31 @@ async def on_message(message: discord.Message):
     # prevent bot from reacting to its own messages
     if message.author.id == bot.user.id:
         return
-    # gallery chat control
+    # prevent bot from responding to already-removed messages
     if message.channel.id == Config.CHANNELS['gallery']:
-        # if message has pics don't do anything
-        if len(message.attachments) > 0:
-            return
-        # else check if user has previously uploaded any pics
-        allowed = False
-        async for old_message in message.channel.history(limit=75):
-            if old_message.author == message.author and len(
-                    old_message.attachments) > 0:
-                allowed = True
-                break
-        # if no pics from that user found, delete and notify
-        if not allowed:
-            await message.delete()
-            await message.channel.send(
-                content=get_gallery_warning(message.author), delete_after=12.5)
-    await bot.process_commands(message)
+    if await check_gallery_message(message):
+        await bot.process_commands(message)
+    else:
+        await bot.process_commands(message)
+
+
+async def check_gallery_message(message: discord.Message) -> bool:
+    # ignore message if it has attachments
+    if len(message.attachments) > 0:
+        return True
+
+    # check if user has previously uploaded any pics
+    allowed = False
+    async for old_message in message.channel.history(limit=75):
+        if old_message.author == message.author and len(old_message.attachments) > 0:
+            allowed = True
+            break
+    # if no pics from that user found, delete and notify
+    if not allowed:
+        await message.delete()
+        await message.channel.send(content=get_gallery_warning(message.author),
+                                   delete_after=12.5)
+    return allowed
 
 
 def get_gallery_warning(user: discord.Member) -> str:
