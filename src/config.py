@@ -9,6 +9,7 @@ class Config:
     BOT_TOKEN = ''
     OWNER_IDS = []
     ROLE_IDS = []
+    PATRON_ID = 0
 
     CHANNELS = {
         'support': 0,
