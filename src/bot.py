@@ -1,6 +1,6 @@
+from time import monotonic
 import discord
 from discord.ext import commands
-from time import monotonic
 from config import Config
 from store import Store
 from order import Order
@@ -100,7 +100,7 @@ def get_gallery_warning(user: discord.Member) -> str:
            'discussion or ask in <#{}> if you have any questions.\n\nIf you ' \
            'want to voice your opinion - feel free to do so, just don\'t ' \
            'forget to send some pictures first!'.format(
-            user.mention, Config.CHANNELS['lounge'], Config.CHANNELS['support'])
+               user.mention, Config.CHANNELS['lounge'], Config.CHANNELS['support'])
 
 
 if __name__ == "__main__":
