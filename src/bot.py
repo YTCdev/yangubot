@@ -44,6 +44,7 @@ async def status(ctx, order_id):
     if not order_id.isdigit():
         await send_error(ctx, ':warning: Invalid order ID entered')
         return
+    await ctx.trigger_typing()
     response = ytc.get_order(order_id)
     if 'code' in response:
         if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
@@ -77,8 +78,8 @@ async def on_message(message: discord.Message):
         return
     # prevent bot from responding to already-removed messages
     if message.channel.id == Config.CHANNELS['gallery']:
-    if await check_gallery_message(message):
-        await bot.process_commands(message)
+        if await check_gallery_message(message):
+            await bot.process_commands(message)
     else:
         await bot.process_commands(message)
 
