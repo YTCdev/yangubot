@@ -2,8 +2,10 @@ from time import monotonic
 import discord
 from discord.ext import commands
 from config import Config
+from ccm import CustomCommandsManager
 from store import Store
 from order import Order
+from misc import Misc
 
 ytc = Store(Config.WCM_URL, Config.WCM_KEY, Config.WCM_SECRET)
 bot = commands.Bot(command_prefix='!')
@@ -12,29 +14,11 @@ bot.remove_command("help")
 
 @bot.event
 async def on_ready():
+    bot.add_cog(CustomCommandsManager(bot))
     print('logged in as {}'.format(bot.user))
     print(discord.utils.oauth_url(
         bot.user.id, permissions=discord.Permissions(8)))
     print('-----')
-
-
-@bot.event
-async def send_error(ctx, message, footer=None):
-    embed = discord.Embed(title=message, colour=Config.COLOURS['failed'])
-    if footer is not None:
-        embed.set_footer(text=footer)
-    await ctx.send(embed=embed)
-    print(message)
-    print('-----')
-
-
-@bot.event
-async def is_staff(ctx):
-    roles = [role.id for role in ctx.author.roles]
-    for staff_role in Config.STAFF_IDS:
-        if staff_role in roles:
-            return True
-    return False
 
 
 @bot.command()
@@ -42,16 +26,16 @@ async def status(ctx, order_id):
     start_time = monotonic()
     print("Check order id {}".format(order_id))
     if not order_id.isdigit():
-        await send_error(ctx, ':warning: Invalid order ID entered')
+        await Misc.send_error(ctx, ':warning: Invalid order ID entered')
         return
     await ctx.trigger_typing()
     response = ytc.get_order(order_id)
     if 'code' in response:
         if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
-            await send_error(ctx, ':warning: No order exists with the given ID')
+            await Misc.send_error(ctx, ':warning: No order exists with the given ID')
         else:
-            await send_error(ctx, ':warning: An error occurred',
-                             response['code'])
+            await Misc.send_error(ctx, ':warning: An error occurred',
+                                  response['code'])
         return
     notes = ytc.get_order_notes(order_id)
     order = Order(response, notes)
@@ -83,7 +67,7 @@ async def add_patron_role(ctx, order: Order):
 
 
 @bot.command()
-@commands.check(is_staff)
+@commands.check(Misc.is_staff)
 async def wcm(ctx, order_id):
     await ctx.author.send(
         "{}/wp-admin/post.php?post={}&action=edit".format(
@@ -101,7 +85,9 @@ async def on_message(message: discord.Message):
         if await check_gallery_message(message):
             await bot.process_commands(message)
     else:
-        await bot.process_commands(message)
+        ccm = bot.get_cog('CustomCommandsManager')
+        if not await ccm.check_message(message):
+            await bot.process_commands(message)
 
 
 async def check_gallery_message(message: discord.Message) -> bool:
