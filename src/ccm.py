@@ -1,23 +1,12 @@
-import json
+from dataclasses import dataclass
 from discord.ext import commands
+import jsonpickle
 from misc import Misc
 
 
 class CustomCommandsManager(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.commands: dict
-        self.load_commands()
-
-    def load_commands(self):
-        try:
-            with open('commands.json', 'r') as file:
-                self.commands = json.load(file)
-        except IOError:
-            print('commands.json not found; creating file')
-            with open('commands.json', 'w') as file:
-                self.commands = dict()
-                json.dump(self.commands, file)
 
 
     @commands.group()
@@ -40,3 +29,26 @@ class CustomCommandsManager(commands.Cog):
     @cc.command()
     async def list(self, ctx):
         pass
+
+
+    def load_commands(self):
+        try:
+            with open('commands.json', 'r') as file:
+                return jsonpickle.decode(file)
+        except IOError:
+            print('commands.json not found; creating file')
+            with open('commands.json', 'w') as file:
+                file.write(jsonpickle.encode([]))
+                return []
+
+
+    # returns false if couldn't save commands
+    def save_commands(self, commands_list) -> bool:
+        try:
+            with open('commands.json', 'w') as file:
+                file.write(jsonpickle.encode(commands_list))
+                return True
+        except IOError:
+            print('couldn\'t save commands')
+            return False
+
