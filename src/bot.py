@@ -28,13 +28,9 @@ async def send_error(ctx, message, footer=None):
     print('-----')
 
 
-@bot.event
-async def is_staff(ctx):
+def is_staff(ctx):
     roles = [role.id for role in ctx.author.roles]
-    for staff_role in Config.STAFF_IDS:
-        if staff_role in roles:
-            return True
-    return False
+    return any(id in roles for id in Config.STAFF_IDS)
 
 
 @bot.command()
