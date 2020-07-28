@@ -21,31 +21,21 @@ async def on_ready():
     print('-----')
 
 
-@bot.event
-async def send_error(ctx, message, footer=None):
-    embed = discord.Embed(title=message, colour=0xF44336)
-    if footer is not None:
-        embed.set_footer(text=footer)
-    await ctx.send(embed=embed)
-    print(message)
-    print('-----')
-
-
 @bot.command()
 async def status(ctx, order_id):
     start_time = monotonic()
     print("Check order id {}".format(order_id))
     if not order_id.isdigit():
-        await send_error(ctx, ':warning: Invalid order ID entered')
+        await Misc.send_error(ctx, ':warning: Invalid order ID entered')
         return
     await ctx.trigger_typing()
     response = ytc.get_order(order_id)
     if 'code' in response:
         if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
-            await send_error(ctx, ':warning: No order exists with the given ID')
+            await Misc.send_error(ctx, ':warning: No order exists with the given ID')
         else:
-            await send_error(ctx, ':warning: An error occurred',
-                             response['code'])
+            await Misc.send_error(ctx, ':warning: An error occurred',
+                                  response['code'])
         return
     notes = ytc.get_order_notes(order_id)
     order = Order(response, notes)
