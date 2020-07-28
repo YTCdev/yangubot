@@ -126,4 +126,4 @@ dmypy.json
 
 .idea/
 src/config.py
-src/commands.json
+commands.json
