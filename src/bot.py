@@ -28,11 +28,6 @@ async def send_error(ctx, message, footer=None):
     print('-----')
 
 
-def is_staff(ctx):
-    roles = [role.id for role in ctx.author.roles]
-    return any(id in roles for id in Config.STAFF_IDS)
-
-
 @bot.command()
 async def status(ctx, order_id):
     start_time = monotonic()
@@ -79,7 +74,7 @@ async def add_patron_role(ctx, order: Order):
 
 
 @bot.command()
-@commands.check(is_staff)
+@commands.check(Misc.is_staff)
 async def wcm(ctx, order_id):
     await ctx.author.send(
         "{}/wp-admin/post.php?post={}&action=edit".format(
