@@ -2,8 +2,10 @@ from time import monotonic
 import discord
 from discord.ext import commands
 from config import Config
+from ccm import CustomCommandsManager
 from store import Store
 from order import Order
+from misc import Misc
 
 ytc = Store(Config.WCM_URL, Config.WCM_KEY, Config.WCM_SECRET)
 bot = commands.Bot(command_prefix='!')
@@ -12,6 +14,7 @@ bot.remove_command("help")
 
 @bot.event
 async def on_ready():
+    bot.add_cog(CustomCommandsManager(bot))
     print('logged in as {}'.format(bot.user))
     print(discord.utils.oauth_url(
         bot.user.id, permissions=discord.Permissions(8)))
