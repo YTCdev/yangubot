@@ -85,7 +85,9 @@ async def on_message(message: discord.Message):
         if await check_gallery_message(message):
             await bot.process_commands(message)
     else:
-        await bot.process_commands(message)
+        ccm = bot.get_cog('CustomCommandsManager')
+        if not await ccm.check_message(message):
+            await bot.process_commands(message)
 
 
 async def check_gallery_message(message: discord.Message) -> bool:
