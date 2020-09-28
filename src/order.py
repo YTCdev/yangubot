@@ -69,10 +69,14 @@ class Order:
         else:
             embed.colour = Config.COLOURS['other']
 
+        ship_method_print = "**{}**\n{}".format(
+                self.status.capitalize(), self.shipping_method.capitalize())
+        if 'shipping' not in ship_method_print.lower():
+            ship_method_print += " shipping"
+
         embed.add_field(
             name="#{} • :flag_{}:".format(self.id, self.country.lower()),
-            value="**{}**\n{} shipping".format(
-                self.status.capitalize(), self.shipping_method.capitalize()),
+            value=ship_method_print,
             inline=True
         )
 
