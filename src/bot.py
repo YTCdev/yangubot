@@ -26,15 +26,19 @@ async def status(ctx, order_id):
     start_time = monotonic()
     print("Check order id {}".format(order_id))
     if not order_id.isdigit():
-        await Misc.send_error(ctx, ':warning: Invalid order ID entered')
+        await Misc.send_error(
+            ctx,
+            ':warning: Order ID must only consist of numbers',
+            'Example: !status 12345')
         return
     await ctx.trigger_typing()
     response = ytc.get_order(order_id)
     if 'code' in response:
         if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
-            await Misc.send_error(ctx, ':warning: No order exists with the given ID')
+            await Misc.send_error(
+                ctx, ':warning: No order exists with the given ID')
         else:
-            await Misc.send_error(ctx, ':warning: An error occurred',
+            await Misc.send_error(ctx, ':warning: Unknown error occurred, please ping a staff member for assistance',
                                   response['code'])
         return
     notes = ytc.get_order_notes(order_id)
