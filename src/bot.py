@@ -19,6 +19,9 @@ async def on_ready():
     print(discord.utils.oauth_url(
         bot.user.id, permissions=discord.Permissions(8)))
     print('-----')
+    await bot.change_presence(
+        activity=discord.Activity(
+            type=discord.ActivityType.watching, name='#support'))
 
 
 @bot.command()
