@@ -1,4 +1,5 @@
 from time import monotonic
+from sys import exit
 import discord
 from discord.ext import commands
 from config import Config
@@ -80,6 +81,13 @@ async def wcm(ctx, order_id):
         "{}/wp-admin/post.php?post={}&action=edit".format(
             Config.WCM_URL, order_id))
     await ctx.message.delete()
+
+
+@bot.command()
+@commands.check(Misc.is_owner)
+async def stop_bot(ctx):
+    await Misc.send_msg(ctx, "Attempting to stop bot...")
+    exit()
 
 
 @bot.event
