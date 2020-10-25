@@ -10,7 +10,7 @@ class Misc:
 
     @staticmethod
     def is_owner(ctx):
-        return ctx.author.roles in Config.STAFF_IDS
+        return ctx.author.id in Config.OWNER_IDS
 
     @staticmethod
     async def send_error(ctx, message, footer=None):
