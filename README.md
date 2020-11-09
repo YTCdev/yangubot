@@ -9,10 +9,14 @@ YanguBot is a Discord bot that integrates with a WooCommerce store that can help
 - Auto-assigning roles to verified customers
 - Custom commands
 
+## Disclaimer
+
+In its current state, YanguBot is configured for our use case and some features may require you to manually reconfigure them in the code. At the moment, one of priorities is to make this more user-friendly to modify.
+
 ## Getting Started
 
 0. Install Python 3.7 and prerequisites using `pip install -r requirements.txt`.
-1. Make a copy of `config_ex.py` and rename it to `config.py`. Configure the bot as desired. See [Configuration](##Configuration).
+1. Make a copy of `config_ex.py` and rename it to `config.py`. Configure the bot as desired. See [Configuration](##configuration).
 2. Run the bot using `python bot.py`.
 
 ## Configuration
@@ -23,7 +27,7 @@ TODO
 
 `!status <order_id>` - Check the status of an order.
 
-`!cc <add/remove/list>` - Manage custom commands. See [Custom Commands](###Custom-Commands). **Requires a staff role.**
+`!cc <add/remove/list>` - Manage custom commands. See [Custom Commands](###custom-commands). **Requires a staff role.**
 
 `!wcm <order_id>` - Sends a Direct Message to the sender containing a direct link to the order on WooCommerce. **Requires a staff role.**
 
@@ -41,4 +45,4 @@ Custom commands allow you to set messages that can be triggered by staff members
 
 ## License
 
-TODO
+[MIT](LICENSE)
