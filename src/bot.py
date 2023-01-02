@@ -9,13 +9,16 @@ from order import Order
 from misc import Misc
 
 ytc = Store(Config.WCM_URL, Config.WCM_KEY, Config.WCM_SECRET)
-bot = commands.Bot(command_prefix='!')
+
+intents = discord.Intents.default()
+intents.message_content = True
+bot = commands.Bot(command_prefix='!', intents=intents)
 bot.remove_command("help")
 
 
 @bot.event
 async def on_ready():
-    bot.add_cog(CustomCommandsManager(bot))
+    await bot.add_cog(CustomCommandsManager(bot))
     print('logged in as {}'.format(bot.user))
     print(discord.utils.oauth_url(
         bot.user.id, permissions=discord.Permissions(8)))
@@ -35,25 +38,25 @@ async def status(ctx, order_id):
             ':warning: Order ID must only consist of numbers',
             'Example: !status 12345')
         return
-    await ctx.trigger_typing()
-    response = ytc.get_order(order_id)
-    if 'code' in response:
-        if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
-            await Misc.send_error(
-                ctx, ':warning: No order exists with the given ID')
-        else:
-            await Misc.send_error(ctx, ':warning: Unknown error occurred, please ping a staff member for assistance',
-                                  response['code'])
-        return
-    notes = ytc.get_order_notes(order_id)
-    order = Order(response, notes)
-    embed = order.create_embed()
-    await ctx.send(embed=embed)
-    if order.status in ['processing', 'completed']:
-        await add_patron_role(ctx, order)
-    end_time = monotonic()
-    print('ok, took {:.2f} s'.format(end_time - start_time))
-    print('-----')
+    async with ctx.typing():
+        response = ytc.get_order(order_id)
+        if 'code' in response:
+            if response['code'] == 'woocommerce_rest_shop_order_invalid_id':
+                await Misc.send_error(
+                    ctx, ':warning: No order exists with the given ID')
+            else:
+                await Misc.send_error(ctx, ':warning: Unknown error occurred, please ping a staff member for assistance',
+                                    response['code'])
+            return
+        notes = ytc.get_order_notes(order_id)
+        order = Order(response, notes)
+        embed = order.create_embed()
+        await ctx.send(embed=embed)
+        if order.status in ['processing', 'completed']:
+            await add_patron_role(ctx, order)
+        end_time = monotonic()
+        print('ok, took {:.2f} s'.format(end_time - start_time))
+        print('-----')
 
 
 async def add_patron_role(ctx, order: Order):
